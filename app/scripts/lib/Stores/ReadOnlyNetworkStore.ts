@@ -69,7 +69,7 @@ export default class ReadOnlyNetworkStore extends BaseStore {
 
   async isFirstTimeInstall(): Promise<boolean> {
     const result = await this.get();
-    if (result === null) {
+    if (result === null && this.hasStateExisted === false) {
       return true;
     }
     return false;
@@ -93,7 +93,7 @@ export default class ReadOnlyNetworkStore extends BaseStore {
     if (!this.mostRecentRetrievedState) {
       this.mostRecentRetrievedState = this.#state;
     }
-    return this.#state ?? this.generateFirstTimeState();
+    return this.#state ?? (await this.generateFirstTimeState());
   }
 
   /**

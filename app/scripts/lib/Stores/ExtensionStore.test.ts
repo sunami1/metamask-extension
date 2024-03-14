@@ -103,11 +103,24 @@ describe('ExtensionStore', () => {
   });
 
   describe('get', () => {
+    const EXPECTED_DEFAULT_DATA = {
+      config: {},
+    };
+    const EXPECTED_DATA_IF_CORRUPTION = {
+      ...EXPECTED_DEFAULT_DATA,
+      PreferencesController: {
+        initializationFlags: {
+          corruptionDetected: true,
+          vaultBackedUp: false,
+        },
+      },
+    };
+
     it('should return default state tree if called in a browser that does not support local storage', async () => {
       const localStore = setup({ localMock: false });
       const result = await localStore.get();
       expect(result).toStrictEqual({
-        data: { config: {} },
+        data: EXPECTED_DEFAULT_DATA,
         meta: { version: 0 },
       });
     });
@@ -140,7 +153,7 @@ describe('ExtensionStore', () => {
       const result = await localStore.get();
 
       expect(result).toStrictEqual({
-        data: { config: {} },
+        data: EXPECTED_DATA_IF_CORRUPTION,
         meta: { version: 0 },
       });
 
@@ -158,7 +171,7 @@ describe('ExtensionStore', () => {
       const result = await localStore.get();
 
       expect(result).toStrictEqual({
-        data: { config: {} },
+        data: EXPECTED_DATA_IF_CORRUPTION,
         meta: { version: 0 },
       });
 
@@ -178,7 +191,7 @@ describe('ExtensionStore', () => {
       const result = await localStore.get();
 
       expect(result).toStrictEqual({
-        data: { config: {} },
+        data: EXPECTED_DATA_IF_CORRUPTION,
         meta: { version: 0 },
       });
 
@@ -198,7 +211,7 @@ describe('ExtensionStore', () => {
       const result = await localStore.get();
 
       expect(result).toStrictEqual({
-        data: { config: {} },
+        data: EXPECTED_DATA_IF_CORRUPTION,
         meta: { version: 0 },
       });
 
