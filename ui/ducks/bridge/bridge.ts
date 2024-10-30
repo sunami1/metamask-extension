@@ -10,6 +10,9 @@ import {
   QuoteResponse,
   SortOrder,
 } from '../../pages/bridge/types';
+// TODO: Remove restricted import
+// eslint-disable-next-line import/no-restricted-paths
+import { DEFAULT_SLIPPAGE } from '../../../app/scripts/controllers/bridge/constants';
 
 export type BridgeState = {
   toChainId: Hex | null;
@@ -20,6 +23,7 @@ export type BridgeState = {
   toTokenExchangeRate: number | null;
   sortOrder: SortOrder;
   selectedQuote: (QuoteResponse & QuoteMetadata) | null; // Alternate quote selected by user. When quotes refresh, the best match will be activated.
+  slippage: number;
 };
 
 const initialState: BridgeState = {
@@ -31,6 +35,7 @@ const initialState: BridgeState = {
   toTokenExchangeRate: null,
   sortOrder: SortOrder.COST_ASC,
   selectedQuote: null,
+  slippage: DEFAULT_SLIPPAGE,
 };
 
 export const setSrcTokenExchangeRates = createAsyncThunk(
@@ -86,6 +91,9 @@ const bridgeSlice = createSlice({
     },
     setSelectedQuote: (state, action) => {
       state.selectedQuote = action.payload;
+    },
+    setSlippage: (state, action) => {
+      state.slippage = action.payload;
     },
   },
   extraReducers: (builder) => {
