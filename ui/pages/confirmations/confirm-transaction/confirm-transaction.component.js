@@ -56,6 +56,7 @@ import { TraceName } from '../../../../shared/lib/trace';
 import ConfirmTokenTransactionSwitch from './confirm-token-transaction-switch';
 
 const ConfirmTransaction = () => {
+  console.log('ConfirmTransaction1');
   const dispatch = useDispatch();
   const history = useHistory();
   const { id: paramsTransactionId } = useParams();
@@ -81,7 +82,10 @@ const ConfirmTransaction = () => {
   const [transaction, setTransaction] = useState(getTransaction);
   const use4ByteResolution = useSelector(use4ByteResolutionSelector);
   const { currentConfirmation } = useCurrentConfirmation();
+  console.log('currentConfirmation', currentConfirmation);
+  console.log('paramsTransactionId', paramsTransactionId);
 
+  console.log('ConfirmTransaction2');
   useEffect(() => {
     const tx = getTransaction();
     setTransaction(tx);
@@ -96,6 +100,8 @@ const ConfirmTransaction = () => {
     unconfirmedTxs,
     unconfirmedTxsSorted,
   ]);
+
+  console.log('ConfirmTransaction3');
 
   const { id, type } = transaction;
 
@@ -116,6 +122,8 @@ const ConfirmTransaction = () => {
     });
   }, [id, isNotification, type, transaction.msgParams]);
 
+  console.log('ConfirmTransaction4');
+
   const transactionId = id;
   const isValidTokenMethod = isTokenMethodAction(type);
   const isValidTransactionId =
@@ -124,6 +132,8 @@ const ConfirmTransaction = () => {
 
   const prevParamsTransactionId = usePrevious(paramsTransactionId);
   const prevTransactionId = usePrevious(transactionId);
+
+  console.log('ConfirmTransaction5');
 
   usePolling({
     startPolling: (input) =>
@@ -151,6 +161,8 @@ const ConfirmTransaction = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  console.log('ConfirmTransaction6');
+
   useEffect(() => {
     if (
       paramsTransactionId &&
@@ -161,6 +173,7 @@ const ConfirmTransaction = () => {
 
       dispatch(clearConfirmTransaction());
       dispatch(setTransactionToConfirm(paramsTransactionId));
+      console.log('poo');
       if (origin !== ORIGIN_METAMASK) {
         dispatch(getContractMethodData(data, use4ByteResolution));
       }
@@ -189,6 +202,8 @@ const ConfirmTransaction = () => {
     use4ByteResolution,
   ]);
 
+  console.log('ConfirmTransaction7');
+
   // Code below is required as we need to support both new and old confirmation pages,
   // It takes care to render <Confirm /> component for confirmations of type Personal Sign.
   // Once we migrate all confirmations to new designs we can get rid of this code
@@ -197,9 +212,14 @@ const ConfirmTransaction = () => {
     return <Confirm />;
   }
 
+  console.log('ConfirmTransaction8');
+
   if (isValidTokenMethod && isValidTransactionId) {
     return <ConfirmTokenTransactionSwitch transaction={transaction} />;
   }
+
+  console.log('ConfirmTransaction9');
+
   // Show routes when state.confirmTransaction has been set and when either the ID in the params
   // isn't specified or is specified and matches the ID in state.confirmTransaction in order to
   // support URLs of /confirm-transaction or /confirm-transaction/<transactionId>

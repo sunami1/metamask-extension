@@ -1434,7 +1434,11 @@ export const getMetadataContractName = createSelector(
 export const getTxData = (state) => state.confirmTransaction.txData;
 
 export const getUnapprovedTransaction = createDeepEqualSelector(
-  (state) => getUnapprovedTransactions(state),
+  (state) => {
+    const h = getUnapprovedTransactions(state);
+    console.log('h', h);
+    return h;
+  },
   (_, transactionId) => transactionId,
   (unapprovedTxs, transactionId) =>
     Object.values(unapprovedTxs).find(({ id }) => id === transactionId),

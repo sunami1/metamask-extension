@@ -35,6 +35,8 @@ const useCurrentConfirmation = () => {
   const oldestPendingApproval = useSelector(oldestPendingConfirmationSelector);
   const confirmationId = paramsConfirmationId ?? oldestPendingApproval?.id;
 
+  console.log('confirmationId', confirmationId);
+
   const isRedesignedSignaturesUserSettingEnabled = useSelector(
     getRedesignedConfirmationsEnabled,
   );
@@ -51,14 +53,26 @@ const useCurrentConfirmation = () => {
     process.env.ENABLE_CONFIRMATION_REDESIGN === 'true' ||
     isRedesignedConfirmationsDeveloperEnabled;
 
+  console.log(
+    'isRedesignedSignaturesUserSettingEnabled',
+    isRedesignedSignaturesUserSettingEnabled,
+    'isRedesignedTransactionsUserSettingEnabled',
+    isRedesignedTransactionsUserSettingEnabled,
+    'isRedesignedConfirmationsDeveloperEnabled',
+    isRedesignedConfirmationsDeveloperEnabled,
+    'isRedesignedConfirmationsDeveloperSettingEnabled',
+    isRedesignedConfirmationsDeveloperSettingEnabled,
+  );
+
   const pendingApproval = useSelector((state) =>
     selectPendingApproval(state as ApprovalsMetaMaskState, confirmationId),
   );
 
-  const transactionMetadata = useSelector((state) =>
+  const transactionMetadata = useSelector((state) => {
+    console.log('confirmationId', confirmationId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (getUnapprovedTransaction as any)(state, confirmationId),
-  ) as TransactionMeta | undefined;
+    return (getUnapprovedTransaction as any)(state, confirmationId);
+  }) as TransactionMeta | undefined;
 
   const signatureMessage = useSelector((state) =>
     selectUnapprovedMessage(state, confirmationId),
@@ -73,6 +87,13 @@ const useCurrentConfirmation = () => {
       transactionMetadata?.type as TransactionType,
     );
 
+  console.log(
+    'isCorrectDeveloperTransactionType',
+    isCorrectDeveloperTransactionType,
+  );
+  console.log('transactionMetadata', transactionMetadata);
+  console.log('REDESIGN_DEV_TRANSACTION_TYPES', REDESIGN_DEV_TRANSACTION_TYPES);
+
   const isCorrectApprovalType = REDESIGN_APPROVAL_TYPES.includes(
     pendingApproval?.type as ApprovalType,
   );
@@ -86,6 +107,13 @@ const useCurrentConfirmation = () => {
       isCorrectUserTransactionType) ||
     (isRedesignedConfirmationsDeveloperSettingEnabled &&
       isCorrectDeveloperTransactionType);
+
+  console.log(
+    'shouldUseRedesignForSignatures',
+    shouldUseRedesignForSignatures,
+    'shouldUseRedesignForTransactions',
+    shouldUseRedesignForTransactions,
+  );
 
   // If the developer toggle or the build time environment variable are enabled,
   // all the signatures and transactions in development are shown. If the user

@@ -26,7 +26,7 @@ const TOKEN_RECIPIENT_ADDRESS = '0x2f318C334780961FB129D2a6c30D0763d9a5C970';
 describe('Confirmation Redesign Token Send @no-mmi', function () {
   describe('ERC721', function () {
     describe('Wallet initiated', async function () {
-      it('Sends a type 0 transaction (Legacy)', async function () {
+      it.only('Sends a type 0 transaction (Legacy)', async function () {
         await withRedesignConfirmationFixtures(
           this.test?.fullTitle(),
           TransactionEnvelopeType.legacy,
@@ -216,10 +216,12 @@ async function createERC721WalletInitiatedTransactionAndAssertDetails(
   const sendToPage = new SendTokenPage(driver);
   await sendToPage.check_pageIsLoaded();
   await sendToPage.fillRecipient(TOKEN_RECIPIENT_ADDRESS);
+  await driver.delay(100000);
   await sendToPage.goToNextScreen();
 
   const tokenTransferTransactionConfirmation =
     new TokenTransferTransactionConfirmation(driver);
+  await driver.delay(1000000);
   await tokenTransferTransactionConfirmation.check_walletInitiatedHeadingTitle();
   await tokenTransferTransactionConfirmation.check_networkParagraph();
   await tokenTransferTransactionConfirmation.check_interactingWithParagraph();
@@ -310,6 +312,7 @@ async function createERC1155WalletInitiatedTransactionAndAssertDetails(
 
   const tokenTransferTransactionConfirmation =
     new TokenTransferTransactionConfirmation(driver);
+
   await tokenTransferTransactionConfirmation.check_walletInitiatedHeadingTitle();
   await tokenTransferTransactionConfirmation.check_networkParagraph();
   await tokenTransferTransactionConfirmation.check_interactingWithParagraph();

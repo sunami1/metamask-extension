@@ -95,6 +95,7 @@ import {
   setTheme,
   showOnboardingHeader,
 } from './utils';
+// eslint-disable-next-line import/order
 import { mmLazy } from '../../helpers/utils/mm-lazy';
 
 // Begin Lazy Routes
@@ -113,10 +114,10 @@ const SnapList = mmLazy(() => import('../snaps/snaps-list'));
 const SnapView = mmLazy(() => import('../snaps/snap-view'));
 
 // eslint-disable-next-line -- Un-lazy this one for now
-import ConfirmTransaction from '../confirmations/confirm-transaction';
-// const ConfirmTransaction = mmLazy(() =>
-//   import('../confirmations/confirm-transaction'),
-// );
+// import ConfirmTransaction from '../confirmations/confirm-transaction';
+const ConfirmTransaction = mmLazy(() =>
+  import('../confirmations/confirm-transaction'),
+);
 
 const SendPage = mmLazy(() => import('../../components/multichain/pages/send'));
 const Swaps = mmLazy(() => import('../swaps'));
@@ -361,10 +362,6 @@ export default class Routes extends Component {
             path={INTERACTIVE_REPLACEMENT_TOKEN_PAGE}
             component={InteractiveReplacementTokenPage}
             exact
-          />
-          <Authenticated
-            path={CONFIRM_ADD_CUSTODIAN_TOKEN}
-            component={ConfirmAddCustodianToken}
           />
           <Authenticated
             path={CUSTODY_ACCOUNT_ROUTE}
