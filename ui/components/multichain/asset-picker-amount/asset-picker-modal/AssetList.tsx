@@ -22,6 +22,7 @@ import {
   FlexWrap,
 } from '../../../../helpers/constants/design-system';
 import { TokenListItem } from '../..';
+import LoadingScreen from '../../../ui/loading-screen';
 import AssetComponent from './Asset';
 import { AssetWithDisplayData, ERC20Asset, NativeAsset } from './types';
 
@@ -38,6 +39,7 @@ type AssetListProps = {
     token: AssetWithDisplayData<ERC20Asset> | AssetWithDisplayData<NativeAsset>,
   ) => boolean;
   network?: NetworkConfiguration;
+  isTokenListLoading?: boolean;
 };
 
 export default function AssetList({
@@ -46,6 +48,7 @@ export default function AssetList({
   tokenList,
   isTokenDisabled,
   network,
+  isTokenListLoading = false,
 }: AssetListProps) {
   const selectedToken = asset?.address;
 
@@ -69,6 +72,12 @@ export default function AssetList({
 
   return (
     <Box className="tokens-main-view-modal">
+      {isTokenListLoading && (
+        <LoadingScreen
+          loadingMessage={'Loading token list'}
+          showLoadingSpinner
+        />
+      )}
       {tokenList.map((token) => {
         const tokenAddress = token.address?.toLowerCase();
         const isSelected = tokenAddress === selectedToken?.toLowerCase();
