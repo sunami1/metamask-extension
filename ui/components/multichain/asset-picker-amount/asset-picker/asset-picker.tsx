@@ -72,7 +72,11 @@ export type AssetPickerProps = {
   isDisabled?: boolean;
   networkProps?: Pick<
     React.ComponentProps<typeof AssetPickerModalNetwork>,
-    'network' | 'networks' | 'onNetworkChange' | 'shouldDisableNetwork'
+    | 'network'
+    | 'networks'
+    | 'onNetworkChange'
+    | 'shouldDisableNetwork'
+    | 'header'
   >;
 } & Pick<
   React.ComponentProps<typeof AssetPickerModal>,
