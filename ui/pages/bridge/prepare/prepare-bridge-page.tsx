@@ -232,7 +232,7 @@ const PrepareBridgePage = () => {
         borderColor={BorderColor.borderMuted}
       >
         <BridgeInputGroup
-          header={t('bridgeFrom')}
+          header={t('swapSelectToken')}
           token={fromToken}
           onAmountChange={(e) => {
             dispatch(setFromTokenInputValue(e));
@@ -328,7 +328,7 @@ const PrepareBridgePage = () => {
         </Box>
 
         <BridgeInputGroup
-          header={t('bridgeTo')}
+          header={t('swapSelectToken')}
           token={toToken}
           onAssetChange={(token) => {
             dispatch(setToToken(token));
@@ -346,6 +346,7 @@ const PrepareBridgePage = () => {
             header: t('bridgeTo'),
             shouldDisableNetwork: ({ chainId }) =>
               chainId === fromChain?.chainId,
+            header: t('bridgeTo'),
           }}
           customTokenListGenerator={
             toChain && toTokens && toTopAssets
