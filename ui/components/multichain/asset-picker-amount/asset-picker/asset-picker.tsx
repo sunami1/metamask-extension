@@ -174,6 +174,7 @@ export function AssetPicker({
         header={header}
         isOpen={showAssetPickerModal}
         onClose={() => setShowAssetPickerModal(false)}
+        onBack={networkProps ? () => setIsSelectingNetwork(true) : undefined}
         asset={asset}
         onAssetChange={(
           token:
