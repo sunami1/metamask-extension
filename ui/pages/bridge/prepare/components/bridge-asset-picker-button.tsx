@@ -28,6 +28,7 @@ import {
 import { IconName } from '@metamask/snaps-sdk/jsx';
 import { useI18nContext } from '../../../../hooks/useI18nContext';
 import { AssetPicker } from '../../../../components/multichain/asset-picker-amount/asset-picker';
+import { NETWORK_TO_NAME_MAP } from '../../../../../shared/constants/network';
 
 export const BridgeAssetPickerButton = ({
   asset,
@@ -70,7 +71,11 @@ export const BridgeAssetPickerButton = ({
       label={<Text ellipsis>{asset?.symbol ?? t('bridgeTo')}</Text>}
       description={
         asset && networkProps?.network
-          ? t('onNetwork', [networkProps.network.name])
+          ? t('onNetwork', [
+              NETWORK_TO_NAME_MAP[
+                networkProps.network.chainId as keyof typeof NETWORK_TO_NAME_MAP
+              ] ?? networkProps.network.name,
+            ])
           : undefined
       }
       startAccessory={
