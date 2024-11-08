@@ -125,7 +125,11 @@ export const AssetPickerModalNetwork = ({
               return (
                 <NetworkListItem
                   key={chainId}
-                  name={networkName}
+                  name={
+                    NETWORK_TO_NAME_MAP[
+                      chainId as keyof typeof NETWORK_TO_NAME_MAP
+                    ] ?? name
+                  }
                   selected={network?.chainId === chainId}
                   onClick={() => {
                     onNetworkChange(networkConfig);
