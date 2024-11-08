@@ -41,7 +41,10 @@ export const isValidQuoteRequest = (
         partialRequest[field as keyof typeof partialRequest] !== undefined &&
         !isNaN(Number(partialRequest[field as keyof typeof partialRequest])) &&
         partialRequest[field as keyof typeof partialRequest] !== null,
-    )
+    ) &&
+    (requireAmount
+      ? Boolean((partialRequest.srcTokenAmount ?? '').match(/^[1-9]\d*$/u))
+      : true)
   );
 };
 
@@ -189,9 +192,9 @@ export const formatEtaInMinutes = (estimatedProcessingTimeInSeconds: number) =>
 
 export const formatTokenAmount = (
   amount: BigNumber,
-  symbol: string,
+  symbol: string = '',
   precision: number = DEFAULT_PRECISION,
-) => `${amount.toFixed(precision)} ${symbol}`;
+) => [amount.toFixed(precision), symbol].join(' ').trim();
 
 export const formatFiatAmount = (
   amount: BigNumber | null,

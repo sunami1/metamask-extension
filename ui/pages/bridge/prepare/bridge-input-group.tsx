@@ -36,8 +36,12 @@ import {
   CHAIN_ID_TO_CURRENCY_SYMBOL_MAP,
   CHAIN_ID_TOKEN_IMAGE_MAP,
 } from '../../../../shared/constants/network';
+import { BRIDGE_MIN_FIAT_SRC_AMOUNT } from '../../../../shared/constants/bridge';
 import useLatestBalance from '../../../hooks/bridge/useLatestBalance';
-import { getBridgeQuotes } from '../../../ducks/bridge/selectors';
+import {
+  getBridgeQuotes,
+  getValidationErrors,
+} from '../../../ducks/bridge/selectors';
 import { BridgeToken } from '../types';
 import { BridgeAssetPickerButton } from './components/bridge-asset-picker-button';
 
@@ -73,6 +77,7 @@ export const BridgeInputGroup = ({
   onAssetChange,
   onAmountChange,
   networkProps,
+  isTokenListLoading,
   customTokenListGenerator,
   amountFieldProps,
   amountInFiat,
@@ -89,7 +94,11 @@ export const BridgeInputGroup = ({
   onMaxButtonClick?: (value: string) => void;
 } & Pick<
   React.ComponentProps<typeof AssetPicker>,
-  'networkProps' | 'header' | 'customTokenListGenerator' | 'onAssetChange'
+  | 'networkProps'
+  | 'header'
+  | 'customTokenListGenerator'
+  | 'onAssetChange'
+  | 'isTokenListLoading'
 >) => {
   const t = useI18nContext();
 
@@ -99,6 +108,9 @@ export const BridgeInputGroup = ({
   const selectedChainId = networkProps?.network?.chainId;
   const isAmountReadOnly =
     amountFieldProps?.readOnly || amountFieldProps?.disabled;
+
+  const { isInsufficientBalance, isSrcAmountTooLow } =
+    useSelector(getValidationErrors);
 
   const blockExplorerUrl =
     networkProps?.network?.defaultBlockExplorerUrlIndex === undefined
@@ -135,6 +147,7 @@ export const BridgeInputGroup = ({
           onAssetChange={onAssetChange}
           networkProps={networkProps}
           customTokenListGenerator={customTokenListGenerator}
+          isTokenListLoading={isTokenListLoading}
         >
           {(onClickHandler, networkImageSrc) => (
             <BridgeAssetPickerButton
@@ -205,7 +218,11 @@ export const BridgeInputGroup = ({
           display={Display.Flex}
           gap={2}
           variant={TextVariant.bodySm}
-          color={TextColor.textAlternative}
+          color={
+            !isAmountReadOnly && isInsufficientBalance(normalizedBalance)
+              ? TextColor.errorDefault
+              : TextColor.textAlternative
+          }
           style={{ height: 20 }}
         >
           {isAmountReadOnly &&
@@ -255,6 +272,17 @@ export const BridgeInputGroup = ({
               </ButtonLink>
             )}
         </Text>
+        {!isAmountReadOnly && isSrcAmountTooLow && (
+          <Text variant={TextVariant.bodySm} color={TextColor.errorDefault}>
+            {t('minimumAmountError', [
+              formatFiatAmount(
+                new BigNumber(BRIDGE_MIN_FIAT_SRC_AMOUNT),
+                currency,
+                0,
+              ),
+            ])}
+          </Text>
+        )}
       </Row>
     </Column>
   );

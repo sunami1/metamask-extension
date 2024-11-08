@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Text, PopoverPosition } from '../../../components/component-library';
-import { getBridgeQuotes } from '../../../ducks/bridge/selectors';
+import { BigNumber } from 'bignumber.js';
+import {
+  BannerAlert,
+  BannerAlertSeverity,
+  Text,
+  PopoverPosition,
+} from '../../../components/component-library';
+import {
+  getBridgeQuotes,
+  getValidationErrors,
+} from '../../../ducks/bridge/selectors';
 import { useI18nContext } from '../../../hooks/useI18nContext';
 import {
   formatFiatAmount,
@@ -20,7 +29,10 @@ import {
   TextVariant,
 } from '../../../helpers/constants/design-system';
 import { Row, Column, Tooltip } from '../layout';
-import { BRIDGE_MM_FEE_RATE } from '../../../../shared/constants/bridge';
+import {
+  BRIDGE_MIN_FIAT_SRC_AMOUNT,
+  BRIDGE_MM_FEE_RATE,
+} from '../../../../shared/constants/bridge';
 import { BridgeQuotesModal } from './bridge-quotes-modal';
 
 export const BridgeQuoteCard = () => {
@@ -29,6 +41,8 @@ export const BridgeQuoteCard = () => {
     useSelector(getBridgeQuotes);
   const currency = useSelector(getCurrentCurrency);
   const ticker = useSelector(getNativeCurrency);
+  const { isNoQuotesAvailable, isSrcAmountLessThan30, isSrcAmountTooLow } =
+    useSelector(getValidationErrors);
 
   const secondsUntilNextRefresh = useCountdownTimer();
 
@@ -129,6 +143,35 @@ export const BridgeQuoteCard = () => {
           </Column>
         </Column>
       ) : null}
+      {isNoQuotesAvailable && (
+        <BannerAlert
+          title={t('noOptionsAvailable')}
+          severity={BannerAlertSeverity.Danger}
+          description={
+            isSrcAmountLessThan30
+              ? t('noOptionsAvailableLessThan30Message')
+              : t('noOptionsAvailableMessage')
+          }
+          textAlign={TextAlign.Left}
+        />
+      )}
+      {isSrcAmountTooLow &&
+        !activeQuote &&
+        !isNoQuotesAvailable &&
+        !isLoading && (
+          <BannerAlert
+            title={t('amountTooLow')}
+            severity={BannerAlertSeverity.Warning}
+            description={t('cantBridgeUnderAmount', [
+              formatFiatAmount(
+                new BigNumber(BRIDGE_MIN_FIAT_SRC_AMOUNT),
+                'usd',
+                0,
+              ),
+            ])}
+            textAlign={TextAlign.Left}
+          />
+        )}
     </>
   );
 };
