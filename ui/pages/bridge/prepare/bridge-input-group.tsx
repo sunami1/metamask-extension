@@ -78,9 +78,9 @@ export const BridgeInputGroup = ({
   amountInFiat,
   onMaxButtonClick,
 }: {
+  amountInFiat?: BigNumber;
   onAmountChange?: (value: string) => void;
   token: BridgeToken | null;
-  amountInFiat?: BigNumber;
   amountFieldProps: Pick<
     React.ComponentProps<typeof TextField>,
     'testId' | 'autoFocus' | 'value' | 'readOnly' | 'disabled' | 'className'
