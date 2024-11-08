@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import {
   Box,
+  Icon,
+  IconName,
   Popover,
   PopoverHeader,
   PopoverPosition,
@@ -21,7 +23,7 @@ const Tooltip = React.forwardRef(
     disabled = false,
     ...props
   }: PopoverProps<'div'> & {
-    triggerElement: React.ReactElement;
+    triggerElement?: React.ReactElement;
     disabled?: boolean;
   }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -39,7 +41,7 @@ const Tooltip = React.forwardRef(
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          {triggerElement}
+          {triggerElement ?? <Icon name={IconName.Question} />}
         </Box>
         {!disabled && (
           <Popover
