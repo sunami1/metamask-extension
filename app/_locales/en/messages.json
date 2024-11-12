@@ -2839,6 +2839,7 @@
   "loadingScreenSnapMessage": {
     "message": "Please complete the transaction on the Snap."
   },
+  "loadingTokenList": { "message": "Loading token list" },
   "loadingTokens": {
     "message": "Loading tokens..."
   },
