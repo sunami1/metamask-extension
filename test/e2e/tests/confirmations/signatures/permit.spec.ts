@@ -11,6 +11,7 @@ import {
 import { Ganache } from '../../../seeder/ganache';
 import { Driver } from '../../../webdriver/driver';
 import {
+  mockPermitDecoding,
   mockSignatureApproved,
   mockSignatureRejected,
   scrollAndConfirmAndAssertConfirm,
@@ -109,6 +110,36 @@ describe('Confirmation Signature - Permit @no-mmi', function (this: Suite) {
         });
       },
       mockSignatureRejected,
+    );
+  });
+
+  it('display decoding information if available', async function () {
+    await withRedesignConfirmationFixtures(
+      this.test?.fullTitle(),
+      TransactionEnvelopeType.legacy,
+      async ({ driver }: TestSuiteArguments) => {
+        process.env.ENABLE_SIGNATURE_DECODING = 'true';
+        process.env.DECODING_API_URL =
+          'https://qtgdj2huxh.execute-api.us-east-2.amazonaws.com/uat/v1';
+        await unlockWallet(driver);
+        await openDapp(driver);
+        await driver.clickElement('#signPermit');
+        await driver.switchToWindowWithTitle(WINDOW_TITLES.Dialog);
+        const simulationSection = driver.findElement({
+          text: 'Estimated changes',
+        });
+        const receiveChange = driver.findElement({ text: 'You receive' });
+        const listChange = driver.findElement({ text: 'You list' });
+        const listChangeValue = driver.findElement({ text: '#2101' });
+
+        assert.ok(await simulationSection, 'Estimated changes');
+        assert.ok(await receiveChange, 'You receive');
+        assert.ok(await listChange, 'You list');
+        assert.ok(await listChangeValue, '#2101');
+
+        await driver.delay(10000);
+      },
+      mockPermitDecoding,
     );
   });
 });

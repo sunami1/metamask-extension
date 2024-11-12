@@ -101,3 +101,34 @@ export async function mockSignatureRejected(
     ...anonEvents,
   ];
 }
+
+export async function mockPermitDecoding(mockServer: Mockttp) {
+  return [
+    await mockServer
+      .forPost(
+        'https://qtgdj2huxh.execute-api.us-east-2.amazonaws.com/uat/v1/signature',
+      )
+      .thenCallback(() => ({
+        statusCode: 200,
+        json: {
+          stateChanges: [
+            {
+              assetType: 'NATIVE',
+              changeType: 'RECEIVE',
+              address: '',
+              amount: '900000000000000000',
+              contractAddress: '',
+            },
+            {
+              assetType: 'ERC721',
+              changeType: 'LISTING',
+              address: '',
+              amount: '',
+              contractAddress: '0xafd4896984CA60d2feF66136e57f958dCe9482d5',
+              tokenID: '2101',
+            },
+          ],
+        },
+      })),
+  ];
+}
