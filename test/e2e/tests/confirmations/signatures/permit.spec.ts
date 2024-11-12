@@ -11,6 +11,7 @@ import {
 import { Ganache } from '../../../seeder/ganache';
 import { Driver } from '../../../webdriver/driver';
 import {
+  DECODING_E2E_API_URL,
   mockPermitDecoding,
   mockSignatureApproved,
   mockSignatureRejected,
@@ -119,8 +120,7 @@ describe('Confirmation Signature - Permit @no-mmi', function (this: Suite) {
       TransactionEnvelopeType.legacy,
       async ({ driver }: TestSuiteArguments) => {
         process.env.ENABLE_SIGNATURE_DECODING = 'true';
-        process.env.DECODING_API_URL =
-          'https://qtgdj2huxh.execute-api.us-east-2.amazonaws.com/uat/v1';
+        process.env.DECODING_API_URL = DECODING_E2E_API_URL;
         await unlockWallet(driver);
         await openDapp(driver);
         await driver.clickElement('#signPermit');

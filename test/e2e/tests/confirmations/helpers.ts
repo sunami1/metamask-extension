@@ -9,6 +9,9 @@ import { MockedEndpoint, Mockttp } from '../../mock-e2e';
 import { SMART_CONTRACTS } from '../../seeder/smart-contracts';
 import { Driver } from '../../webdriver/driver';
 
+export const DECODING_E2E_API_URL =
+  'https://qtgdj2huxh.execute-api.us-east-2.amazonaws.com/uat/v1';
+
 export async function scrollAndConfirmAndAssertConfirm(driver: Driver) {
   await driver.clickElementSafe('.confirm-scroll-to-bottom__button');
   await driver.clickElement('[data-testid="confirm-footer-button"]');
@@ -105,9 +108,7 @@ export async function mockSignatureRejected(
 export async function mockPermitDecoding(mockServer: Mockttp) {
   return [
     await mockServer
-      .forPost(
-        'https://qtgdj2huxh.execute-api.us-east-2.amazonaws.com/uat/v1/signature',
-      )
+      .forPost(`${DECODING_E2E_API_URL}/signature`)
       .thenCallback(() => ({
         statusCode: 200,
         json: {
