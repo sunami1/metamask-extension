@@ -346,7 +346,6 @@ const PrepareBridgePage = () => {
             header: t('bridgeTo'),
             shouldDisableNetwork: ({ chainId }) =>
               chainId === fromChain?.chainId,
-            header: t('bridgeTo'),
           }}
           customTokenListGenerator={
             toChain && toTokens && toTopAssets

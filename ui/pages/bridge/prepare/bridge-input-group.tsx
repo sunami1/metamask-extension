@@ -10,6 +10,7 @@ import {
   TextField,
   TextFieldType,
   ButtonLink,
+  PopoverPosition,
 } from '../../../components/component-library';
 import { AssetPicker } from '../../../components/multichain/asset-picker-amount/asset-picker';
 import { TabName } from '../../../components/multichain/asset-picker-amount/asset-picker-modal/asset-picker-modal-tabs';
@@ -20,7 +21,7 @@ import {
   NativeAsset,
 } from '../../../components/multichain/asset-picker-amount/asset-picker-modal/types';
 import { formatFiatAmount } from '../utils/quote';
-import { Column, Row } from '../layout';
+import { Column, Row, Tooltip } from '../layout';
 import {
   BlockSize,
   Display,
@@ -36,13 +37,16 @@ import {
   CHAIN_ID_TO_CURRENCY_SYMBOL_MAP,
   CHAIN_ID_TOKEN_IMAGE_MAP,
 } from '../../../../shared/constants/network';
-import { BRIDGE_MIN_FIAT_SRC_AMOUNT } from '../../../../shared/constants/bridge';
+import {
+  BRIDGE_MIN_FIAT_SRC_AMOUNT,
+  BRIDGE_QUOTE_MAX_RETURN_DIFFERENCE_PERCENTAGE,
+} from '../../../../shared/constants/bridge';
+import { BridgeToken } from '../types';
 import useLatestBalance from '../../../hooks/bridge/useLatestBalance';
 import {
   getBridgeQuotes,
   getValidationErrors,
 } from '../../../ducks/bridge/selectors';
-import { BridgeToken } from '../types';
 import { BridgeAssetPickerButton } from './components/bridge-asset-picker-button';
 
 const generateAssetFromToken = (
@@ -109,7 +113,7 @@ export const BridgeInputGroup = ({
   const isAmountReadOnly =
     amountFieldProps?.readOnly || amountFieldProps?.disabled;
 
-  const { isInsufficientBalance, isSrcAmountTooLow } =
+  const { isInsufficientBalance, isSrcAmountTooLow, isEstimatedReturnLow } =
     useSelector(getValidationErrors);
 
   const blockExplorerUrl =
@@ -282,6 +286,18 @@ export const BridgeInputGroup = ({
               ),
             ])}
           </Text>
+        )}
+        {isAmountReadOnly && isEstimatedReturnLow && (
+          <Tooltip
+            title={t('lowEstimatedReturnTooltipTitle')}
+            position={PopoverPosition.BottomStart}
+            offset={[0, 16]}
+            isOpen
+          >
+            {t('lowEstimatedReturnTooltipMessage', [
+              BRIDGE_QUOTE_MAX_RETURN_DIFFERENCE_PERCENTAGE * 100,
+            ])}
+          </Tooltip>
         )}
       </Row>
     </Column>

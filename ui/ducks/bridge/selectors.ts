@@ -445,6 +445,14 @@ export const getValidationErrors = createDeepEqualSelector(
       isSrcAmountLessThan30:
         activeQuote?.sentAmount.fiat?.lt(30) &&
         activeQuote?.sentAmount.fiat?.gt(BRIDGE_MIN_FIAT_SRC_AMOUNT),
+      isEstimatedReturnLow:
+        activeQuote?.sentAmount?.fiat && activeQuote?.adjustedReturn?.fiat
+          ? activeQuote.adjustedReturn.fiat.lt(
+              new BigNumber(
+                BRIDGE_QUOTE_MAX_RETURN_DIFFERENCE_PERCENTAGE,
+              ).times(activeQuote.sentAmount.fiat),
+            )
+          : false,
       isSrcAmountTooLow:
         fromAmount && fromAmountInFiat.lte(BRIDGE_MIN_FIAT_SRC_AMOUNT),
       isInsufficientGasBalance: (balance?: BigNumber) =>
