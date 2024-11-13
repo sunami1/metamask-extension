@@ -18,7 +18,7 @@ import {
   formatEtaInMinutes,
 } from '../utils/quote';
 import { useCountdownTimer } from '../../../hooks/bridge/useCountdownTimer';
-import { getCurrentCurrency } from '../../../selectors';
+import { getCurrentChainId, getCurrentCurrency } from '../../../selectors';
 import { getNativeCurrency } from '../../../ducks/metamask/metamask';
 import {
   AlignItems,
@@ -33,6 +33,8 @@ import {
   BRIDGE_MIN_FIAT_SRC_AMOUNT,
   BRIDGE_MM_FEE_RATE,
 } from '../../../../shared/constants/bridge';
+import useLatestBalance from '../../../hooks/bridge/useLatestBalance';
+import { SWAPS_CHAINID_DEFAULT_TOKEN_MAP } from '../../../../shared/constants/swaps';
 import { BridgeQuotesModal } from './bridge-quotes-modal';
 
 export const BridgeQuoteCard = () => {
@@ -46,9 +48,17 @@ export const BridgeQuoteCard = () => {
     isSrcAmountLessThan30,
     isSrcAmountTooLow,
     isNetworkCongested,
+    isInsufficientGasBalance,
   } = useSelector(getValidationErrors);
+  const currentChainId = useSelector(getCurrentChainId);
 
   const secondsUntilNextRefresh = useCountdownTimer();
+  const { normalizedBalance: nativeAssetBalance } = useLatestBalance(
+    SWAPS_CHAINID_DEFAULT_TOKEN_MAP[
+      currentChainId as keyof typeof SWAPS_CHAINID_DEFAULT_TOKEN_MAP
+    ],
+    currentChainId,
+  );
 
   const [showAllQuotes, setShowAllQuotes] = useState(false);
 
@@ -177,6 +187,22 @@ export const BridgeQuoteCard = () => {
         !isLoading && (
           <BannerAlert
             title={t('amountTooLow')}
+            severity={BannerAlertSeverity.Warning}
+            description={t('cantBridgeUnderAmount', [
+              formatFiatAmount(
+                new BigNumber(BRIDGE_MIN_FIAT_SRC_AMOUNT),
+                'usd',
+                0,
+              ),
+            ])}
+            textAlign={TextAlign.Left}
+          />
+        )}
+      {activeQuote &&
+        isInsufficientGasBalance(nativeAssetBalance) &&
+        !isLoading && (
+          <BannerAlert
+            title={'TODO gas balance error'}
             severity={BannerAlertSeverity.Warning}
             description={t('cantBridgeUnderAmount', [
               formatFiatAmount(

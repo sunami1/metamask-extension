@@ -447,6 +447,10 @@ export const getValidationErrors = createDeepEqualSelector(
         activeQuote?.sentAmount.fiat?.gt(BRIDGE_MIN_FIAT_SRC_AMOUNT),
       isSrcAmountTooLow:
         fromAmount && fromAmountInFiat.lte(BRIDGE_MIN_FIAT_SRC_AMOUNT),
+      isInsufficientGasBalance: (balance?: BigNumber) =>
+        balance && activeQuote?.totalNetworkFee?.raw
+          ? activeQuote.totalNetworkFee.raw.gt(balance)
+          : false,
       isInsufficientBalance: (balance?: BigNumber) =>
         fromAmount && balance !== undefined ? balance.lt(fromAmount) : false,
       isNetworkCongested: networkCongestion
