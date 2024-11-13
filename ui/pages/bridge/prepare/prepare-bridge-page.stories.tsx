@@ -31,6 +31,10 @@ const mockFeatureFlags = {
   srcNetworkAllowlist: [CHAIN_IDS.MAINNET, CHAIN_IDS.LINEA_MAINNET],
   destNetworkAllowlist: [CHAIN_IDS.MAINNET, CHAIN_IDS.LINEA_MAINNET],
   extensionSupport: true,
+  extensionConfig: {
+    refreshRate: 30000,
+    maxRefreshCount: 5,
+  },
 };
 const mockBridgeSlice = {
   toChainId: CHAIN_IDS.LINEA_MAINNET,
@@ -44,46 +48,47 @@ export const DefaultStory = () => {
 DefaultStory.storyName = 'Default';
 DefaultStory.decorators = [
   (Story) => (
-    <Wrapper>
-      <Provider
-        store={configureStore(
-          createBridgeMockStore(
-            mockFeatureFlags,
-            mockBridgeSlice,
-            {
-              quotes: [],
-              destTokens: {
-                '0x1234': { symbol: 'USDC', address: '0x1234', decimals: 6 },
+    <Provider
+      store={configureStore(
+        createBridgeMockStore({
+          featureFlagOverrides: mockFeatureFlags,
+          bridgeSliceOverrides: mockBridgeSlice,
+          bridgeStateOverrides: {
+            quotes: [],
+            destTokens: {
+              '0x1234': { symbol: 'USDC', address: '0x1234', decimals: 6 },
+            },
+            srcTokens: {
+              '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85': {
+                symbol: 'USDC',
+                address: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
+                decimals: 6,
               },
-              srcTokens: {
-                '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85': {
-                  symbol: 'USDC',
-                  address: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
-                  decimals: 6,
+            },
+            quotesLastFetchedMs: Date.now(),
+          },
+          metamaskStateOverrides: {
+            useExternalServices: true,
+            currencyRates: {
+              ETH: { conversionRate: 2514.5 },
+            },
+            marketData: {
+              '0x1': {
+                ['0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85']: {
+                  price: 0.00039762010419237126,
+                  contractPercentChange1d: 0.004,
+                  priceChange1d: 0.00004,
                 },
               },
             },
-            {
-              useExternalServices: true,
-              currencyRates: {
-                ETH: { conversionRate: 2514.5 },
-              },
-              marketData: {
-                '0x1': {
-                  ['0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85']: {
-                    price: 0.00039762010419237126,
-                    contractPercentChange1d: 0.004,
-                    priceChange1d: 0.00004,
-                  },
-                },
-              },
-            },
-          ),
-        )}
-      >
+          },
+        }),
+      )}
+    >
+      <Wrapper>
         <Story />
-      </Provider>
-    </Wrapper>
+      </Wrapper>
+    </Provider>
   ),
 ];
 
@@ -96,10 +101,10 @@ LoadingStory.decorators = [
     <Wrapper>
       <Provider
         store={configureStore(
-          createBridgeMockStore(
-            mockFeatureFlags,
-            mockBridgeSlice,
-            {
+          createBridgeMockStore({
+            featureFlagOverrides: mockFeatureFlags,
+            bridgeSliceOverrides: mockBridgeSlice,
+            bridgeStateOverrides: {
               quotes: [],
               quotesLastFetched: 134,
               quotesLoadingStatus: RequestStatus.LOADING,
@@ -114,7 +119,7 @@ LoadingStory.decorators = [
                 },
               },
             },
-            {
+            metamaskStateOverrides: {
               useExternalServices: true,
               currencyRates: {
                 ETH: { conversionRate: 2514.5 },
@@ -129,7 +134,7 @@ LoadingStory.decorators = [
                 },
               },
             },
-          ),
+          }),
         )}
       >
         <Story />
@@ -147,10 +152,10 @@ NoQuotesStory.decorators = [
     <Wrapper>
       <Provider
         store={configureStore(
-          createBridgeMockStore(
-            mockFeatureFlags,
-            mockBridgeSlice,
-            {
+          createBridgeMockStore({
+            featureFlagOverrides: mockFeatureFlags,
+            bridgeSliceOverrides: mockBridgeSlice,
+            bridgeStateOverrides: {
               quotes: [],
               quotesLastFetched: 134,
               quotesLoadingStatus: RequestStatus.FETCHED,
@@ -165,7 +170,7 @@ NoQuotesStory.decorators = [
                 },
               },
             },
-            {
+            metamaskStateOverrides: {
               useExternalServices: true,
               currencyRates: {
                 ETH: { conversionRate: 2514.5 },
@@ -180,7 +185,7 @@ NoQuotesStory.decorators = [
                 },
               },
             },
-          ),
+          }),
         )}
       >
         <Story />
@@ -198,10 +203,10 @@ QuotesFetchedStory.decorators = [
     <Wrapper>
       <Provider
         store={configureStore(
-          createBridgeMockStore(
-            mockFeatureFlags,
-            mockBridgeSlice,
-            {
+          createBridgeMockStore({
+            featureFlagOverrides: mockFeatureFlags,
+            bridgeSliceOverrides: mockBridgeSlice,
+            bridgeStateOverrides: {
               quotes: mockBridgeQuotesErc20Erc20,
               quotesLastFetched: Date.now(),
               quotesLoadingStatus: RequestStatus.FETCHED,
@@ -216,7 +221,7 @@ QuotesFetchedStory.decorators = [
                 },
               },
             },
-            {
+            metamaskStateOverrides: {
               useExternalServices: true,
               currencyRates: {
                 ETH: { conversionRate: 2514.5 },
@@ -231,7 +236,7 @@ QuotesFetchedStory.decorators = [
                 },
               },
             },
-          ),
+          }),
         )}
       >
         <Story />
