@@ -234,6 +234,7 @@
       "redesignedConfirmationsEnabled": true,
       "redesignedTransactionsEnabled": "boolean",
       "tokenSortConfig": "object",
+      "tokenNetworkFilter": "object",
       "shouldShowAggregatedBalancePopover": "boolean"
     },
     "ipfsGateway": "string",
