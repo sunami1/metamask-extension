@@ -7,6 +7,7 @@ import { createSelector } from 'reselect';
 import { GasFeeEstimates } from '@metamask/gas-fee-controller';
 import { BigNumber } from 'bignumber.js';
 import { zeroAddress } from 'ethereumjs-util';
+import { calcTokenAmount } from '@metamask/notification-services-controller/push-services';
 import {
   getNetworkConfigurationsByChainId,
   getIsBridgeEnabled,
@@ -379,17 +380,27 @@ export const getBridgeQuotes = createSelector(
 
 export const getSlippage = (state: BridgeAppState) => state.bridge.slippage;
 
+const _getValidatedSrcAmount = createSelector(
+  getFromToken,
+  (state: BridgeAppState) =>
+    state.metamask.bridgeState.quoteRequest.srcTokenAmount,
+  (fromToken, srcTokenAmount) =>
+    srcTokenAmount && fromToken?.decimals
+      ? calcTokenAmount(srcTokenAmount, Number(fromToken.decimals)).toFixed()
+      : null,
+);
+
 export const getFromAmountInFiat = createSelector(
   getFromToken,
   getFromChain,
-  getFromAmount,
+  _getValidatedSrcAmount,
   (state: BridgeAppState) => state.bridge.fromTokenExchangeRate,
   getConversionRate,
   getCurrentCurrency,
   (
     fromToken,
     fromChain,
-    fromAmount,
+    validatedSrcAmount,
     fromTokenExchangeRate,
     nativeExchangeRate,
     currentCurrency,
@@ -397,20 +408,20 @@ export const getFromAmountInFiat = createSelector(
     if (
       fromToken?.symbol &&
       fromChain?.chainId &&
-      fromAmount &&
+      validatedSrcAmount &&
       nativeExchangeRate
     ) {
       if (fromToken.address === zeroAddress()) {
         return new BigNumber(
           decEthToConvertedCurrency(
-            fromAmount,
+            validatedSrcAmount,
             currentCurrency,
             nativeExchangeRate,
           ).toString(),
         );
       }
       if (fromTokenExchangeRate) {
-        return new BigNumber(fromAmount).mul(
+        return new BigNumber(validatedSrcAmount).mul(
           new BigNumber(fromTokenExchangeRate.toString() ?? 1),
         );
       }
@@ -432,12 +443,12 @@ export const getIsBridgeTx = createDeepEqualSelector(
 export const getValidationErrors = createDeepEqualSelector(
   getBridgeQuotes,
   getFromAmountInFiat,
-  getFromAmount,
+  _getValidatedSrcAmount,
   getGasFeeEstimates,
   (
     { activeQuote, quotesLastFetchedMs, isLoading },
     fromAmountInFiat,
-    fromAmount,
+    validatedSrcAmount,
     { networkCongestion },
   ) => {
     return {
@@ -454,13 +465,17 @@ export const getValidationErrors = createDeepEqualSelector(
             )
           : false,
       isSrcAmountTooLow:
-        fromAmount && fromAmountInFiat.lte(BRIDGE_MIN_FIAT_SRC_AMOUNT),
+        validatedSrcAmount &&
+        fromAmountInFiat.lte(BRIDGE_MIN_FIAT_SRC_AMOUNT) &&
+        fromAmountInFiat.gt(0),
       isInsufficientGasBalance: (balance?: BigNumber) =>
         balance && activeQuote?.totalNetworkFee?.raw
           ? activeQuote.totalNetworkFee.raw.gt(balance)
           : false,
       isInsufficientBalance: (balance?: BigNumber) =>
-        fromAmount && balance !== undefined ? balance.lt(fromAmount) : false,
+        validatedSrcAmount && balance !== undefined
+          ? balance.lt(validatedSrcAmount)
+          : false,
       isNetworkCongested: networkCongestion
         ? networkCongestion >= NetworkCongestionThresholds.busy
         : false,
