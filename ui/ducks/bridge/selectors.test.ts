@@ -1,3 +1,4 @@
+import { BigNumber } from 'bignumber.js';
 import { createBridgeMockStore } from '../../../test/jest/mock-store';
 import {
   BUILT_IN_NETWORKS,
@@ -502,7 +503,12 @@ describe('Bridge selectors', () => {
     it('returns quote list and fetch data, insufficientBal=false,quotesRefreshCount=5', () => {
       const state = createBridgeMockStore({
         featureFlagOverrides: { extensionConfig: { maxRefreshCount: 5 } },
-        bridgeSliceOverrides: { toChainId: '0x1' },
+        bridgeSliceOverrides: {
+          toChainId: '0x1',
+          fromTokenExchangeRate: 1,
+          toTokenExchangeRate: 0.99,
+          toNativeExchangeRate: 0.354073,
+        },
         bridgeStateOverrides: {
           quoteRequest: { insufficientBal: false },
           quotes: mockErc20Erc20Quotes,
@@ -512,11 +518,47 @@ describe('Bridge selectors', () => {
           srcTokens: { '0x00': { address: '0x00', symbol: 'TEST' } },
           srcTopAssets: [{ address: '0x00', symbol: 'TEST' }],
         },
+        metamaskStateOverrides: {
+          currencyRates: {
+            ETH: {
+              conversionRate: 1,
+            },
+          },
+        },
       });
-      const result = getBridgeQuotes(state as never);
 
+      const recommendedQuoteMetadata = {
+        adjustedReturn: {
+          fiat: expect.any(Object),
+        },
+        cost: { fiat: new BigNumber('0.15656287141025952') },
+        sentAmount: {
+          fiat: new BigNumber('14'),
+          raw: new BigNumber('14'),
+        },
+        swapRate: new BigNumber('0.998877142857142857142857142857142857'),
+        toTokenAmount: {
+          fiat: new BigNumber('13.8444372'),
+          raw: new BigNumber('13.98428'),
+        },
+        totalNetworkFee: {
+          fiat: new BigNumber('0.00100007141025952'),
+          raw: new BigNumber('0.00100007141025952'),
+        },
+      };
+
+      const result = getBridgeQuotes(state as never);
+      expect(result.sortedQuotes).toHaveLength(2);
       expect(result).toStrictEqual({
-        quotes: mockErc20Erc20Quotes,
+        sortedQuotes: expect.any(Array),
+        recommendedQuote: {
+          ...mockErc20Erc20Quotes[0],
+          ...recommendedQuoteMetadata,
+        },
+        activeQuote: {
+          ...mockErc20Erc20Quotes[0],
+          ...recommendedQuoteMetadata,
+        },
         quotesLastFetchedMs: 100,
         isLoading: false,
         quotesRefreshCount: 5,
@@ -527,7 +569,12 @@ describe('Bridge selectors', () => {
     it('returns quote list and fetch data, insufficientBal=false,quotesRefreshCount=2', () => {
       const state = createBridgeMockStore({
         featureFlagOverrides: { extensionConfig: { maxRefreshCount: 5 } },
-        bridgeSliceOverrides: { toChainId: '0x1' },
+        bridgeSliceOverrides: {
+          toChainId: '0x1',
+          fromTokenExchangeRate: 1,
+          toTokenExchangeRate: 0.99,
+          toNativeExchangeRate: 0.354073,
+        },
         bridgeStateOverrides: {
           quoteRequest: { insufficientBal: false },
           quotes: mockErc20Erc20Quotes,
@@ -537,11 +584,53 @@ describe('Bridge selectors', () => {
           srcTokens: { '0x00': { address: '0x00', symbol: 'TEST' } },
           srcTopAssets: [{ address: '0x00', symbol: 'TEST' }],
         },
+        metamaskStateOverrides: {
+          currencyRates: {
+            ETH: {
+              conversionRate: 1,
+            },
+          },
+        },
       });
       const result = getBridgeQuotes(state as never);
 
+      const recommendedQuoteMetadata = {
+        adjustedReturn: {
+          fiat: new BigNumber('13.84343712858974048'),
+        },
+        cost: { fiat: new BigNumber('0.15656287141025952') },
+        sentAmount: {
+          fiat: new BigNumber('14'),
+          raw: new BigNumber('14'),
+        },
+        swapRate: new BigNumber('0.998877142857142857142857142857142857'),
+        toTokenAmount: {
+          fiat: new BigNumber('13.8444372'),
+          raw: new BigNumber('13.98428'),
+        },
+        totalNetworkFee: {
+          fiat: new BigNumber('0.00100007141025952'),
+          raw: new BigNumber('0.00100007141025952'),
+        },
+      };
+      expect(result.sortedQuotes).toHaveLength(2);
+      const EXPECTED_SORTED_COSTS = [
+        { fiat: new BigNumber('0.15656287141025952') },
+        { fiat: new BigNumber('0.33900008283534464') },
+      ];
+      result.sortedQuotes.forEach((quote, idx) => {
+        expect(quote.cost).toStrictEqual(EXPECTED_SORTED_COSTS[idx]);
+      });
       expect(result).toStrictEqual({
-        quotes: mockErc20Erc20Quotes,
+        sortedQuotes: expect.any(Array),
+        recommendedQuote: {
+          ...mockErc20Erc20Quotes[0],
+          ...recommendedQuoteMetadata,
+        },
+        activeQuote: {
+          ...mockErc20Erc20Quotes[0],
+          ...recommendedQuoteMetadata,
+        },
         quotesLastFetchedMs: 100,
         isLoading: false,
         quotesRefreshCount: 2,
@@ -552,7 +641,12 @@ describe('Bridge selectors', () => {
     it('returns quote list and fetch data, insufficientBal=true', () => {
       const state = createBridgeMockStore({
         featureFlagOverrides: { extensionConfig: { maxRefreshCount: 5 } },
-        bridgeSliceOverrides: { toChainId: '0x1' },
+        bridgeSliceOverrides: {
+          toChainId: '0x1',
+          fromTokenExchangeRate: 1,
+          toTokenExchangeRate: 0.99,
+          toNativeExchangeRate: 0.354073,
+        },
         bridgeStateOverrides: {
           quoteRequest: { insufficientBal: true },
           quotes: mockErc20Erc20Quotes,
@@ -562,11 +656,54 @@ describe('Bridge selectors', () => {
           srcTokens: { '0x00': { address: '0x00', symbol: 'TEST' } },
           srcTopAssets: [{ address: '0x00', symbol: 'TEST' }],
         },
+        metamaskStateOverrides: {
+          currencyRates: {
+            ETH: {
+              conversionRate: 1,
+            },
+          },
+        },
       });
       const result = getBridgeQuotes(state as never);
 
+      const recommendedQuoteMetadata = {
+        adjustedReturn: {
+          fiat: new BigNumber('13.84343712858974048'),
+        },
+        cost: { fiat: new BigNumber('0.15656287141025952') },
+        sentAmount: {
+          fiat: new BigNumber('14'),
+          raw: new BigNumber('14'),
+        },
+        swapRate: new BigNumber('0.998877142857142857142857142857142857'),
+        toTokenAmount: {
+          fiat: new BigNumber('13.8444372'),
+          raw: new BigNumber('13.98428'),
+        },
+        totalNetworkFee: {
+          fiat: new BigNumber('0.00100007141025952'),
+          raw: new BigNumber('0.00100007141025952'),
+        },
+      };
+      expect(result.sortedQuotes).toHaveLength(2);
+      const EXPECTED_SORTED_COSTS = [
+        { fiat: new BigNumber('0.15656287141025952') },
+        { fiat: new BigNumber('0.33900008283534464') },
+      ];
+      result.sortedQuotes.forEach((quote, idx) => {
+        expect(quote.cost).toStrictEqual(EXPECTED_SORTED_COSTS[idx]);
+      });
+
       expect(result).toStrictEqual({
-        quotes: mockErc20Erc20Quotes,
+        sortedQuotes: expect.any(Array),
+        recommendedQuote: {
+          ...mockErc20Erc20Quotes[0],
+          ...recommendedQuoteMetadata,
+        },
+        activeQuote: {
+          ...mockErc20Erc20Quotes[0],
+          ...recommendedQuoteMetadata,
+        },
         quotesLastFetchedMs: 100,
         isLoading: false,
         quotesRefreshCount: 1,
@@ -584,7 +721,9 @@ describe('Bridge selectors', () => {
       expect(result).toStrictEqual({
         activeQuote: undefined,
         isLoading: false,
+        isQuoteGoingToRefresh: false,
         quotesLastFetchedMs: undefined,
+        quotesRefreshCount: undefined,
         recommendedQuote: undefined,
         sortedQuotes: [],
       });
@@ -721,6 +860,13 @@ describe('Bridge selectors', () => {
             },
           ],
         },
+        metamaskStateOverrides: {
+          currencyRates: {
+            ETH: {
+              conversionRate: 2524.25,
+            },
+          },
+        },
       });
 
       const { activeQuote, recommendedQuote, sortedQuotes } = getBridgeQuotes(
@@ -748,7 +894,7 @@ describe('Bridge selectors', () => {
       expect(adjustedReturn?.fiat?.toString()).toStrictEqual(
         '21.70206159987361438',
       );
-      expect(cost?.fiat?.toString()).toStrictEqual('-3.54043840012638562');
+      expect(cost?.fiat?.toString()).toStrictEqual('3.54043840012638562');
       expect(sortedQuotes).toHaveLength(3);
       expect(sortedQuotes[0]?.quote.requestId).toStrictEqual('fastestQuote');
       expect(sortedQuotes[1]?.quote.requestId).toStrictEqual(

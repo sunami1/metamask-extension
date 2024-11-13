@@ -20,9 +20,9 @@ describe('useCountdownTimer', () => {
         bridgeStateOverrides: {
           quotesLastFetched,
           quotesRefreshCount: 0,
-          bridgeFeatureFlags: {
-            extensionConfig: { maxRefreshCount: 5, refreshRate: 40000 },
-          },
+        },
+        featureFlagOverrides: {
+          extensionConfig: { maxRefreshCount: 5, refreshRate: 40000 },
         },
       }),
     );

@@ -5,6 +5,7 @@ import { ETH_EOA_METHODS } from '../../shared/constants/eth-methods';
 import { mockNetworkState } from '../stub/networks';
 import { DEFAULT_BRIDGE_CONTROLLER_STATE } from '../../app/scripts/controllers/bridge/constants';
 import { DEFAULT_BRIDGE_STATUS_CONTROLLER_STATE } from '../../app/scripts/controllers/bridge-status/constants';
+import { BRIDGE_PREFERRED_GAS_ESTIMATE } from '../../shared/constants/bridge';
 
 export const createGetSmartTransactionFeesApiResponse = () => {
   return {
@@ -730,8 +731,9 @@ export const createBridgeMockStore = (
         { chainId: CHAIN_IDS.LINEA_MAINNET },
       ),
       gasFeeEstimates: {
-        high: {
-          suggestedMaxFeePerGas: '0.00010456',
+        estimatedBaseFee: '0.00010456',
+        [BRIDGE_PREFERRED_GAS_ESTIMATE]: {
+          suggestedMaxFeePerGas: '0.00018456',
           suggestedMaxPriorityFeePerGas: '0.0001',
         },
       },
