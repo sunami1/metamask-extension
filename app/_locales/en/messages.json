@@ -2411,6 +2411,10 @@
   "high": {
     "message": "Aggressive"
   },
+  "highGasFeesTooltipMessage": {
+    "message": "The network is busy, so gas prices are higher than usual. You can still continue with your bridge, but the transaction will cost more."
+  },
+  "highGasFeesTooltipTitle": { "message": "High gas fees" },
   "highGasSettingToolTipMessage": {
     "message": "High probability, even in volatile markets. Use $1 to cover surges in network traffic due to things like popular NFT drops.",
     "description": "$1 is key 'high' (text: 'Aggressive') separated here so that it can be passed in with bold font-weight"

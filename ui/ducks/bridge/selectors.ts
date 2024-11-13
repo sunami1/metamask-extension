@@ -56,6 +56,7 @@ import {
   decGWEIToHexWEI,
   decEthToConvertedCurrency,
 } from '../../../shared/modules/conversion.utils';
+import { NetworkCongestionThresholds } from '../../../shared/constants/gas';
 import { BridgeState } from './bridge';
 
 export type BridgeAppState = {
@@ -432,10 +433,12 @@ export const getValidationErrors = createDeepEqualSelector(
   getBridgeQuotes,
   getFromAmountInFiat,
   getFromAmount,
+  getGasFeeEstimates,
   (
     { activeQuote, quotesLastFetchedMs, isLoading },
     fromAmountInFiat,
     fromAmount,
+    { networkCongestion },
   ) => {
     return {
       isNoQuotesAvailable: !activeQuote && quotesLastFetchedMs && !isLoading,
@@ -446,6 +449,9 @@ export const getValidationErrors = createDeepEqualSelector(
         fromAmount && fromAmountInFiat.lte(BRIDGE_MIN_FIAT_SRC_AMOUNT),
       isInsufficientBalance: (balance?: BigNumber) =>
         fromAmount && balance !== undefined ? balance.lt(fromAmount) : false,
+      isNetworkCongested: networkCongestion
+        ? networkCongestion >= NetworkCongestionThresholds.busy
+        : false,
     };
   },
 );

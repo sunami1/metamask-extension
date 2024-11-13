@@ -41,8 +41,12 @@ export const BridgeQuoteCard = () => {
     useSelector(getBridgeQuotes);
   const currency = useSelector(getCurrentCurrency);
   const ticker = useSelector(getNativeCurrency);
-  const { isNoQuotesAvailable, isSrcAmountLessThan30, isSrcAmountTooLow } =
-    useSelector(getValidationErrors);
+  const {
+    isNoQuotesAvailable,
+    isSrcAmountLessThan30,
+    isSrcAmountTooLow,
+    isNetworkCongested,
+  } = useSelector(getValidationErrors);
 
   const secondsUntilNextRefresh = useCountdownTimer();
 
@@ -99,9 +103,21 @@ export const BridgeQuoteCard = () => {
                 activeQuote.quote.destAsset.symbol,
               )}`}</Text>
             </Row>
-            {/* TODO add tooltip on hover */}
-            <Row>
-              <Text color={TextColor.textAlternative}>{t('networkFee')}</Text>
+
+            <Row className={isNetworkCongested ? 'warning' : ''}>
+              <Row gap={1}>
+                <Text color={TextColor.textAlternative}>{t('networkFee')}</Text>
+                {isNetworkCongested && (
+                  <Tooltip
+                    title={t('highGasFeesTooltipTitle')}
+                    position={PopoverPosition.TopStart}
+                    offset={[-16, 16]}
+                    color={TextColor.errorDefault}
+                  >
+                    {t('highGasFeesTooltipMessage')}
+                  </Tooltip>
+                )}
+              </Row>
               <Row gap={1}>
                 <Text color={TextColor.textMuted}>
                   {activeQuote.totalNetworkFee?.fiat
