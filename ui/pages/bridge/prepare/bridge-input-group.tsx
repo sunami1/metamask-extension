@@ -219,7 +219,7 @@ export const BridgeInputGroup = ({
             textAlign={TextAlign.End}
             ellipsis
           >
-            {amountInFiat && formatFiatAmount(amountInFiat, currency)}
+            {amountInFiat && formatFiatAmount(amountInFiat, currency, 2)}
           </Text>
         </Column>
       </Row>
