@@ -444,11 +444,13 @@ export const getValidationErrors = createDeepEqualSelector(
   getFromAmountInFiat,
   _getValidatedSrcAmount,
   getGasFeeEstimates,
+  getFromToken,
   (
     { activeQuote, quotesLastFetchedMs, isLoading },
     fromAmountInFiat,
     validatedSrcAmount,
     { networkCongestion },
+    fromToken,
   ) => {
     return {
       isNoQuotesAvailable: !activeQuote && quotesLastFetchedMs && !isLoading,
@@ -467,10 +469,29 @@ export const getValidationErrors = createDeepEqualSelector(
         validatedSrcAmount &&
         fromAmountInFiat.lte(BRIDGE_MIN_FIAT_SRC_AMOUNT) &&
         fromAmountInFiat.gt(0),
-      isInsufficientGasBalance: (balance?: BigNumber) =>
-        balance && activeQuote?.totalNetworkFee?.amount
-          ? activeQuote.totalNetworkFee.amount.gt(balance)
-          : false,
+      // Shown prior to fetching quotes
+      isInsufficientGasBalance: (balance?: BigNumber) => {
+        if (balance && !activeQuote && validatedSrcAmount && fromToken) {
+          const isNativeSrcToken = fromToken.address === zeroAddress();
+          return isNativeSrcToken
+            ? balance.eq(validatedSrcAmount)
+            : balance.lte(0);
+        }
+        return false;
+      },
+      // Shown after fetching quotes
+      isInsufficientGasForQuote: (balance?: BigNumber) => {
+        if (balance && activeQuote && fromToken) {
+          const isNativeSrcToken = fromToken.address === zeroAddress();
+          return isNativeSrcToken
+            ? balance
+                .sub(activeQuote.totalNetworkFee.amount)
+                .sub(activeQuote.sentAmount.amount)
+                .lte(0)
+            : balance.lte(activeQuote.totalNetworkFee.amount);
+        }
+        return false;
+      },
       isInsufficientBalance: (balance?: BigNumber) =>
         validatedSrcAmount && balance !== undefined
           ? balance.lt(validatedSrcAmount)

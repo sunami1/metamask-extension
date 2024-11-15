@@ -301,6 +301,7 @@ export const BridgeInputGroup = ({
             position={PopoverPosition.BottomStart}
             offset={[0, 16]}
             isOpen={Date.now() - quotesLastFetchedMs < 10 * SECOND}
+            hideIcon
           >
             {t('lowEstimatedReturnTooltipMessage', [
               BRIDGE_QUOTE_MAX_RETURN_DIFFERENCE_PERCENTAGE * 100,

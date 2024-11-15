@@ -35,6 +35,7 @@ import {
 } from '../../../../shared/constants/bridge';
 import useLatestBalance from '../../../hooks/bridge/useLatestBalance';
 import { SWAPS_CHAINID_DEFAULT_TOKEN_MAP } from '../../../../shared/constants/swaps';
+import useRamps from '../../../hooks/ramps/useRamps/useRamps';
 import { BridgeQuotesModal } from './bridge-quotes-modal';
 
 export const BridgeQuoteCard = () => {
@@ -59,6 +60,8 @@ export const BridgeQuoteCard = () => {
     ],
     currentChainId,
   );
+
+  const { openBuyCryptoInPdapp } = useRamps();
 
   const [showAllQuotes, setShowAllQuotes] = useState(false);
 
@@ -199,22 +202,16 @@ export const BridgeQuoteCard = () => {
             textAlign={TextAlign.Left}
           />
         )}
-      {activeQuote &&
-        isInsufficientGasBalance(nativeAssetBalance) &&
-        !isLoading && (
-          <BannerAlert
-            title={'TODO gas balance error'}
-            severity={BannerAlertSeverity.Warning}
-            description={t('cantBridgeUnderAmount', [
-              formatFiatAmount(
-                new BigNumber(BRIDGE_MIN_FIAT_SRC_AMOUNT),
-                'usd',
-                0,
-              ),
-            ])}
-            textAlign={TextAlign.Left}
-          />
-        )}
+      {!isLoading && isInsufficientGasBalance(nativeAssetBalance) && (
+        <BannerAlert
+          title={t('bridgeValidationInsufficientGasTitle', [ticker])}
+          severity={BannerAlertSeverity.Warning}
+          description={t('bridgeValidationInsufficientGasMessage', [ticker])}
+          textAlign={TextAlign.Left}
+          actionButtonLabel={t('buyMoreAsset', [ticker])}
+          actionButtonOnClick={() => openBuyCryptoInPdapp()}
+        />
+      )}
     </>
   );
 };
