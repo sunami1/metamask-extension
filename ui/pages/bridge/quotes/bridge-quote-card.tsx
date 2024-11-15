@@ -142,6 +142,7 @@ export const BridgeQuoteCard = () => {
                   {formatFiatAmount(
                     activeQuote.totalNetworkFee?.fiat,
                     currency,
+                    2,
                   ) ??
                     formatTokenAmount(
                       activeQuote.totalNetworkFee?.amount,
