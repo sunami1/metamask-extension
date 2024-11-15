@@ -299,7 +299,7 @@ export const BridgeInputGroup = ({
           <Tooltip
             title={t('lowEstimatedReturnTooltipTitle')}
             position={PopoverPosition.BottomStart}
-            offset={[0, 16]}
+            offset={[-48, -8]}
             isOpen={Date.now() - quotesLastFetchedMs < 10 * SECOND}
             hideIcon
           >
