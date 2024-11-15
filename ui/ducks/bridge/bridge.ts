@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Hex } from '@metamask/utils';
 import { getAddress } from 'ethers/lib/utils';
+import { zeroAddress } from 'ethereumjs-util';
 import { swapsSlice } from '../swaps/swaps';
 import { fetchTokenExchangeRates } from '../../helpers/utils/util';
 import {
@@ -61,6 +62,7 @@ export const setDestTokenExchangeRates = createAsyncThunk(
     );
     return {
       toTokenExchangeRate: exchangeRates?.[getAddress(tokenAddress)],
+      toNativeExchangeRate: exchangeRates?.[zeroAddress()],
     };
   },
 );
