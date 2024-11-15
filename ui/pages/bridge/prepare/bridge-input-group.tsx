@@ -47,6 +47,7 @@ import {
   getBridgeQuotes,
   getValidationErrors,
 } from '../../../ducks/bridge/selectors';
+import { SECOND } from '../../../../shared/constants/time';
 import { BridgeAssetPickerButton } from './components/bridge-asset-picker-button';
 
 const generateAssetFromToken = (
@@ -106,7 +107,7 @@ export const BridgeInputGroup = ({
 >) => {
   const t = useI18nContext();
 
-  const { isLoading } = useSelector(getBridgeQuotes);
+  const { isLoading, quotesLastFetchedMs } = useSelector(getBridgeQuotes);
   const currency = useSelector(getCurrentCurrency);
 
   const selectedChainId = networkProps?.network?.chainId;
@@ -294,12 +295,12 @@ export const BridgeInputGroup = ({
             ])}
           </Text>
         )}
-        {isAmountReadOnly && isEstimatedReturnLow && (
+        {isAmountReadOnly && isEstimatedReturnLow && quotesLastFetchedMs && (
           <Tooltip
             title={t('lowEstimatedReturnTooltipTitle')}
             position={PopoverPosition.BottomStart}
             offset={[0, 16]}
-            isOpen
+            isOpen={Date.now() - quotesLastFetchedMs < 10 * SECOND}
           >
             {t('lowEstimatedReturnTooltipMessage', [
               BRIDGE_QUOTE_MAX_RETURN_DIFFERENCE_PERCENTAGE * 100,
