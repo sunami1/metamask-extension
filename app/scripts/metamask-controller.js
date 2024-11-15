@@ -196,7 +196,7 @@ import {
   ExcludedSnapEndowments,
 } from '../../shared/constants/permissions';
 import { UI_NOTIFICATIONS } from '../../shared/notifications';
-import { MILLISECOND, SECOND } from '../../shared/constants/time';
+import { MILLISECOND, MINUTE, SECOND } from '../../shared/constants/time';
 import {
   ORIGIN_METAMASK,
   POLLING_TOKEN_ENVIRONMENT_TYPES,
@@ -246,6 +246,7 @@ import { getProviderConfig } from '../../ui/ducks/metamask/metamask';
 import { endTrace, trace } from '../../shared/lib/trace';
 // eslint-disable-next-line import/no-restricted-paths
 import { isSnapId } from '../../ui/helpers/utils/snaps';
+import fetchWithCache from '../../shared/lib/fetch-with-cache';
 import { BalancesController as MultichainBalancesController } from './lib/accounts/BalancesController';
 import {
   ///: BEGIN:ONLY_INCLUDE_IF(build-mmi)
@@ -2597,6 +2598,38 @@ export default class MetamaskController extends EventEmitter {
     if (this.onboardingController.state.completedOnboarding) {
       this.postOnboardingInitialization();
     }
+
+    this.getInfuraFeatureFlags();
+  }
+
+  // Provides a method for getting feature flags for the multichain
+  // initial rollout, such that we can remotely limit polling and/or
+  // pause polling of certain chains hosted by Infura
+  getInfuraFeatureFlags() {
+    console.log('getInfuraFeatureFlags!');
+    fetchWithCache({
+      url: 'https://swap.api.cx.metamask.io/featureFlags',
+      cacheRefreshTime: MINUTE * 20,
+    })
+      .then((response) => {
+        console.log('getInfuraFeatureFlags response:', response);
+        const { pollInterval, pausedChainIds } = response;
+        // Polling interval is provided in seconds
+        if (pollInterval > 0) {
+          this.tokenBalancesController.setIntervalLength(pollInterval * SECOND);
+        }
+        // Paused chains
+        if (pausedChainIds instanceof Array) {
+          this.preferencesController.setPreference(
+            'pausedChainIds',
+            pausedChainIds,
+          );
+        }
+      })
+      .catch((e) => {
+        // API unreachable (?)
+        log.warn('Feature flag endpoint is unreachable', e);
+      });
   }
 
   postOnboardingInitialization() {

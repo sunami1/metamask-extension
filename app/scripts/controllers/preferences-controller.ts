@@ -121,6 +121,7 @@ export type Preferences = {
     sortCallback: string;
   };
   tokenNetworkFilter: Record<string, boolean>;
+  pausedChainIds: Hex[];
   shouldShowAggregatedBalancePopover: boolean;
 };
 
@@ -232,6 +233,7 @@ export const getDefaultPreferencesControllerState =
         sortCallback: 'stringNumeric',
       },
       tokenNetworkFilter: {},
+      pausedChainIds: [],
     },
     // ENS decentralized website resolution
     ipfsGateway: IPFS_DEFAULT_GATEWAY_URL,
