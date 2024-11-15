@@ -33,7 +33,6 @@ import {
   getGasFeeEstimates,
   getProviderConfig,
 } from '../metamask/metamask';
-import { SwapsTokenObject } from '../../../shared/constants/swaps';
 // TODO: Remove restricted import
 // eslint-disable-next-line import/no-restricted-paths
 import { RequestStatus } from '../../../app/scripts/controllers/bridge/constants';
@@ -469,8 +468,8 @@ export const getValidationErrors = createDeepEqualSelector(
         fromAmountInFiat.lte(BRIDGE_MIN_FIAT_SRC_AMOUNT) &&
         fromAmountInFiat.gt(0),
       isInsufficientGasBalance: (balance?: BigNumber) =>
-        balance && activeQuote?.totalNetworkFee?.raw
-          ? activeQuote.totalNetworkFee.raw.gt(balance)
+        balance && activeQuote?.totalNetworkFee?.amount
+          ? activeQuote.totalNetworkFee.amount.gt(balance)
           : false,
       isInsufficientBalance: (balance?: BigNumber) =>
         validatedSrcAmount && balance !== undefined
