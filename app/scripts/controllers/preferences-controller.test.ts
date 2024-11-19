@@ -750,7 +750,6 @@ describe('preferences controller', () => {
           order: 'dsc',
           sortCallback: 'stringNumeric',
         },
-        pausedChainIds: [],
         tokenNetworkFilter: {},
       });
     });
@@ -781,7 +780,6 @@ describe('preferences controller', () => {
           order: 'dsc',
           sortCallback: 'stringNumeric',
         },
-        pausedChainIds: [],
         tokenNetworkFilter: {},
       });
     });

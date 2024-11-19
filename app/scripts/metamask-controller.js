@@ -2598,13 +2598,10 @@ export default class MetamaskController extends EventEmitter {
     if (this.onboardingController.state.completedOnboarding) {
       this.postOnboardingInitialization();
     }
-
-    this.getInfuraFeatureFlags();
   }
 
   // Provides a method for getting feature flags for the multichain
-  // initial rollout, such that we can remotely limit polling and/or
-  // pause polling of certain chains hosted by Infura
+  // initial rollout, such that we can remotely modify polling interval
   getInfuraFeatureFlags() {
     console.log('getInfuraFeatureFlags!');
     fetchWithCache({
@@ -2614,17 +2611,10 @@ export default class MetamaskController extends EventEmitter {
       .then((response) => {
         console.log('getInfuraFeatureFlags response:', response);
         const { multiChainAssets = {} } = response;
-        const { pollInterval, pausedChainIds } = multiChainAssets;
+        const { pollInterval } = multiChainAssets;
         // Polling interval is provided in seconds
         if (pollInterval > 0) {
           this.tokenBalancesController.setIntervalLength(pollInterval * SECOND);
-        }
-        // Paused chains
-        if (pausedChainIds instanceof Array) {
-          this.preferencesController.setPreference(
-            'pausedChainIds',
-            pausedChainIds,
-          );
         }
       })
       .catch((e) => {
@@ -2666,6 +2656,7 @@ export default class MetamaskController extends EventEmitter {
     this.accountTrackerController.start();
     this.txController.startIncomingTransactionPolling();
     this.tokenDetectionController.enable();
+    this.getInfuraFeatureFlags();
   }
 
   stopNetworkRequests() {
