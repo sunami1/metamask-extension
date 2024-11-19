@@ -2613,7 +2613,8 @@ export default class MetamaskController extends EventEmitter {
     })
       .then((response) => {
         console.log('getInfuraFeatureFlags response:', response);
-        const { pollInterval, pausedChainIds } = response;
+        const { multiChainAssets = {} } = response;
+        const { pollInterval, pausedChainIds } = multiChainAssets;
         // Polling interval is provided in seconds
         if (pollInterval > 0) {
           this.tokenBalancesController.setIntervalLength(pollInterval * SECOND);
