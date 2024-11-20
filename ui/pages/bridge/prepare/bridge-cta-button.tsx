@@ -101,7 +101,7 @@ export const BridgeCTAButton = () => {
           <Tooltip
             title={t('bridgeValidationInsufficientGasTitle', [ticker])}
             position={PopoverPosition.TopEnd}
-            triggerElement={<Icon name={IconName.Info} />}
+            iconName={IconName.Info}
             isOpen
           >
             {t('bridgeValidationInsufficientGasMessage', [ticker])}
