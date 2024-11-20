@@ -29,10 +29,12 @@ import { useSwapsFeatureFlags } from '../swaps/hooks/useSwapsFeatureFlags';
 import {
   resetBridgeState,
   setFromChain,
+  setFromToken,
   setSrcTokenExchangeRates,
 } from '../../ducks/bridge/actions';
 import { useGasFeeEstimates } from '../../hooks/useGasFeeEstimates';
 import { TextVariant } from '../../helpers/constants/design-system';
+import { SWAPS_CHAINID_DEFAULT_TOKEN_MAP } from '../../../shared/constants/swaps';
 import PrepareBridgePage from './prepare/prepare-bridge-page';
 import { BridgeTransactionSettingsModal } from './prepare/bridge-transaction-settings-modal';
 
@@ -55,12 +57,20 @@ const CrossChainSwap = () => {
     if (isBridgeChain && isBridgeEnabled && providerConfig && currency) {
       dispatch(setFromChain(providerConfig.chainId));
       dispatch(
-        setSrcTokenExchangeRates({
-          chainId: providerConfig.chainId,
-          tokenAddress: zeroAddress(),
-          currency,
-        }),
+        setFromToken(
+          SWAPS_CHAINID_DEFAULT_TOKEN_MAP[
+            providerConfig.chainId as keyof typeof SWAPS_CHAINID_DEFAULT_TOKEN_MAP
+          ],
+        ),
       );
+      // TODO only do this if there's no token query param
+      // dispatch(
+      //   setSrcTokenExchangeRates({
+      //     chainId: providerConfig.chainId,
+      //     tokenAddress: zeroAddress(),
+      //     currency,
+      //   }),
+      // );
     }
   }, [isBridgeChain, isBridgeEnabled, providerConfig, currency]);
 
