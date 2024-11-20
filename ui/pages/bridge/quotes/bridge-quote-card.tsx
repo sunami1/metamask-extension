@@ -126,6 +126,7 @@ export const BridgeQuoteCard = () => {
                     position={PopoverPosition.TopStart}
                     offset={[-16, 16]}
                     color={TextColor.errorDefault}
+                    iconName={IconName.Warning}
                   >
                     {t('highGasFeesTooltipMessage')}
                   </Tooltip>
