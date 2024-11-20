@@ -6,6 +6,7 @@ import {
   BannerAlertSeverity,
   Text,
   PopoverPosition,
+  IconName,
 } from '../../../components/component-library';
 import {
   getBridgeQuotes,
@@ -81,6 +82,7 @@ export const BridgeQuoteCard = () => {
                   title={t('howQuotesWork')}
                   position={PopoverPosition.TopStart}
                   offset={[-16, 16]}
+                  iconName={IconName.Question}
                 >
                   {t('howQuotesWorkExplanation', [BRIDGE_MM_FEE_RATE])}
                 </Tooltip>
