@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   ButtonPrimary,
@@ -61,6 +61,8 @@ export const BridgeCTAButton = () => {
     fromChain?.chainId,
   );
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const isInsufficientBalance = isInsufficientBalance_(normalizedBalance);
   const isInsufficientGasBalance =
     isInsufficientGasBalance_(nativeAssetBalance);
@@ -76,7 +78,8 @@ export const BridgeCTAButton = () => {
     activeQuote &&
     !isInsufficientBalance &&
     !isInsufficientGasBalance &&
-    !isInsufficientGasForQuote;
+    !isInsufficientGasForQuote &&
+    !isSubmitting;
 
   const label = useMemo(() => {
     if (isLoading && !isTxSubmittable) {
@@ -139,6 +142,7 @@ export const BridgeCTAButton = () => {
       data-testid="bridge-cta-button"
       onClick={() => {
         if (isTxSubmittable) {
+          setIsSubmitting(true);
           dispatch(submitBridgeTransaction(activeQuote));
         }
       }}
