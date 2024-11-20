@@ -3,6 +3,7 @@ import {
   Box,
   Icon,
   IconName,
+  IconSize,
   Popover,
   PopoverHeader,
   PopoverPosition,
@@ -10,10 +11,12 @@ import {
   Text,
 } from '../../../components/component-library';
 import {
+  IconColor,
   JustifyContent,
   TextAlign,
   TextColor,
 } from '../../../helpers/constants/design-system';
+import Column from './column';
 
 const Tooltip = React.forwardRef(
   ({
@@ -21,10 +24,14 @@ const Tooltip = React.forwardRef(
     title,
     triggerElement,
     disabled = false,
+    onClose,
+    iconName,
     ...props
   }: PopoverProps<'div'> & {
     triggerElement?: React.ReactElement;
     disabled?: boolean;
+    onClose?: () => void;
+    iconName?: IconName;
   }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [referenceElement, setReferenceElement] =
@@ -41,7 +48,23 @@ const Tooltip = React.forwardRef(
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          {triggerElement ?? <Icon name={IconName.Question} />}
+          {triggerElement}
+          {!triggerElement && !iconName ? (
+            <Icon
+              name={IconName.Question}
+              color={IconColor.iconMuted}
+              size={IconSize.Sm}
+            />
+          ) : (
+            !triggerElement &&
+            iconName && (
+              <Icon
+                color={IconColor.iconMuted}
+                name={iconName}
+                size={IconSize.Sm}
+              />
+            )
+          )}
         </Box>
         {!disabled && (
           <Popover
@@ -63,18 +86,22 @@ const Tooltip = React.forwardRef(
             hasArrow
             {...props}
           >
-            <PopoverHeader
-              color={TextColor.infoInverse}
-              textAlign={TextAlign.Center}
-            >
-              {title}
-            </PopoverHeader>
-            <Text
-              justifyContent={JustifyContent.center}
-              color={TextColor.infoInverse}
-            >
-              {children}
-            </Text>
+            <Column>
+              <PopoverHeader
+                color={TextColor.infoInverse}
+                textAlign={TextAlign.Center}
+                onClose={onClose}
+                childrenWrapperProps={{ style: { whiteSpace: 'nowrap' } }}
+              >
+                {title}
+              </PopoverHeader>
+              <Text
+                justifyContent={JustifyContent.center}
+                color={TextColor.infoInverse}
+              >
+                {children}
+              </Text>
+            </Column>
           </Popover>
         )}
       </>
