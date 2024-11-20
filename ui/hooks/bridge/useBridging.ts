@@ -1,6 +1,7 @@
 import { useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { zeroAddress } from 'ethereumjs-util';
 import { setBridgeFeatureFlags } from '../../ducks/bridge/actions';
 import {
   ///: BEGIN:ONLY_INCLUDE_IF(build-main,build-beta,build-flask)
@@ -17,6 +18,7 @@ import { MetaMetricsContext } from '../../contexts/metametrics';
 import {
   MetaMetricsEventCategory,
   MetaMetricsEventName,
+  MetaMetricsSwapsEventSource,
 } from '../../../shared/constants/metametrics';
 
 import {
@@ -30,12 +32,14 @@ import { isHardwareKeyring } from '../../helpers/utils/hardware';
 import { getPortfolioUrl } from '../../helpers/utils/portfolio';
 import { SwapsTokenObject } from '../../../shared/constants/swaps';
 import { getProviderConfig } from '../../ducks/metamask/metamask';
+import { useCrossChainSwapsEvents } from './useCrossChainSwapsEvents';
 ///: END:ONLY_INCLUDE_IF
 
 const useBridging = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const trackEvent = useContext(MetaMetricsContext);
+  const { trackCrossChainSwapsEvent } = useCrossChainSwapsEvents();
 
   const metaMetricsId = useSelector(getMetaMetricsId);
   const isMetaMetricsEnabled = useSelector(getParticipateInMetaMetrics);
@@ -63,6 +67,19 @@ const useBridging = () => {
       }
 
       if (isBridgeSupported) {
+        trackCrossChainSwapsEvent({
+          event: MetaMetricsEventName.ActionOpened,
+          category: MetaMetricsEventCategory.Navigation,
+          properties: {
+            location:
+              location === 'Home'
+                ? MetaMetricsSwapsEventSource.MainView
+                : MetaMetricsSwapsEventSource.TokenView,
+            chain_id_source: providerConfig.chainId,
+            token_symbol_source: token.symbol,
+            token_address_source: token.address ?? zeroAddress(),
+          },
+        });
         trackEvent({
           event: MetaMetricsEventName.BridgeLinkClicked,
           category: MetaMetricsEventCategory.Navigation,
@@ -118,6 +135,7 @@ const useBridging = () => {
       history,
       metaMetricsId,
       trackEvent,
+      trackCrossChainSwapsEvent,
       isMetaMetricsEnabled,
       isMarketingEnabled,
       providerConfig,
