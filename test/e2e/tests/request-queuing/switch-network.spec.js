@@ -20,7 +20,7 @@ describe('Request Queuing Switch Network on Dapp Send Tx while on different netw
         fixtures: new FixtureBuilder()
           .withNetworkControllerDoubleGanache()
           .withPermissionControllerConnectedToTestDapp()
-          .withPreferencesControllerUseRequestQueueEnabled()
+
           .build(),
         ganacheOptions: {
           ...defaultGanacheOptions,
