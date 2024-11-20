@@ -286,10 +286,7 @@ export const NetworkListMenu = ({ onClose }: { onClose: () => void }) => {
           // If presently on a dapp, communicate a change to
           // the dapp via silent switchEthereumChain that the
           // network has changed due to user action
-          if (
-            selectedTabOrigin &&
-            domains[selectedTabOrigin]
-          ) {
+          if (selectedTabOrigin && domains[selectedTabOrigin]) {
             setNetworkClientIdForDomain(selectedTabOrigin, networkClientId);
           }
 
