@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Hex } from '@metamask/utils';
 import { useSelector } from 'react-redux';
 import { BigNumber } from 'bignumber.js';
@@ -11,6 +11,7 @@ import {
   TextFieldType,
   ButtonLink,
   PopoverPosition,
+  IconName,
 } from '../../../components/component-library';
 import { AssetPicker } from '../../../components/multichain/asset-picker-amount/asset-picker';
 import { TabName } from '../../../components/multichain/asset-picker-amount/asset-picker-modal/asset-picker-modal-tabs';
@@ -47,7 +48,6 @@ import {
   getBridgeQuotes,
   getValidationErrors,
 } from '../../../ducks/bridge/selectors';
-import { SECOND } from '../../../../shared/constants/time';
 import { BridgeAssetPickerButton } from './components/bridge-asset-picker-button';
 
 const generateAssetFromToken = (
@@ -107,7 +107,7 @@ export const BridgeInputGroup = ({
 >) => {
   const t = useI18nContext();
 
-  const { isLoading, quotesLastFetchedMs } = useSelector(getBridgeQuotes);
+  const { isLoading } = useSelector(getBridgeQuotes);
   const currency = useSelector(getCurrentCurrency);
 
   const selectedChainId = networkProps?.network?.chainId;
@@ -134,6 +134,8 @@ export const BridgeInputGroup = ({
       : undefined;
 
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const [isLowReturnTooltipOpen, setIsLowReturnTooltipOpen] = useState(true);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -295,13 +297,13 @@ export const BridgeInputGroup = ({
             ])}
           </Text>
         )}
-        {isAmountReadOnly && isEstimatedReturnLow && quotesLastFetchedMs && (
+        {isAmountReadOnly && isEstimatedReturnLow && isLowReturnTooltipOpen && (
           <Tooltip
             title={t('lowEstimatedReturnTooltipTitle')}
             position={PopoverPosition.BottomStart}
-            offset={[-48, -8]}
-            isOpen={Date.now() - quotesLastFetchedMs < 10 * SECOND}
-            hideIcon
+            isOpen={isLowReturnTooltipOpen}
+            onClose={() => setIsLowReturnTooltipOpen(false)}
+            iconName={IconName.Info}
           >
             {t('lowEstimatedReturnTooltipMessage', [
               BRIDGE_QUOTE_MAX_RETURN_DIFFERENCE_PERCENTAGE * 100,
