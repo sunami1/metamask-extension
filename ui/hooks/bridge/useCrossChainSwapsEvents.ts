@@ -1,4 +1,4 @@
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { MetaMetricsContext } from '../../contexts/metametrics';
 import {
   MetaMetricsEventCategory,
@@ -128,6 +128,14 @@ export const useCrossChainSwapsEvents = () => {
     },
     [trackEvent],
   );
+
+  useEffect(() => {
+    // TODO trigger this if quotes are being fetched for the first time
+    trackCrossChainSwapsEvent({
+      event: MetaMetricsEventName.CrossChainSwapsQuotesRequested,
+      properties: {},
+    });
+  }, []);
 
   return { trackCrossChainSwapsEvent };
 };
