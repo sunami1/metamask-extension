@@ -308,8 +308,9 @@ const _getRecommendedQuote = createDeepEqualSelector(
   },
 );
 
-// Identifies each quote by aggregator, bridge, steps and value
-const getDedupeString = ({ quote }: QuoteResponse & L1GasFees) =>
+// Generates a pseudo-unique string that identifies each quote
+// by aggregator, bridge, steps and value
+const _getQuoteIdentifier = ({ quote }: QuoteResponse & L1GasFees) =>
   `${quote.bridgeId}-${quote.bridges[0]}-${quote.steps.length}`;
 
 const _getSelectedQuote = createSelector(
@@ -322,7 +323,7 @@ const _getSelectedQuote = createSelector(
       : // Find match for selectedQuote in new quotes
         sortedQuotesWithMetadata.find((quote) =>
           selectedQuote
-            ? getDedupeString(quote) === getDedupeString(selectedQuote)
+            ? _getQuoteIdentifier(quote) === _getQuoteIdentifier(selectedQuote)
             : false,
         ),
 );
