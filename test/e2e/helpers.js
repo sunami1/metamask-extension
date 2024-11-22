@@ -967,6 +967,11 @@ async function tempToggleSettingRedesignedTransactionConfirmations(driver) {
   await driver.clickElement(
     '[data-testid="toggle-redesigned-transactions-container"]',
   );
+
+  // Close settings page
+  await driver.clickElement(
+    '.settings-page__header__title-container__close-button',
+  );
 }
 
 /**
