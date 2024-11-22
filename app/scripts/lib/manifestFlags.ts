@@ -9,6 +9,7 @@ export type ManifestFlags = {
     nodeIndex?: number;
     prNumber?: number;
   };
+  run?: string[];
   sentry?: {
     tracesSampleRate?: number;
     forceEnable?: boolean;
