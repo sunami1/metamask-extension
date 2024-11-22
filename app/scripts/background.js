@@ -459,6 +459,7 @@ async function initialize() {
     const offscreenPromise = isManifestV3 ? createOffscreen() : null;
 
     const initData = await loadStateFromPersistence();
+    console.log({ initData });
 
     const initState = initData.data;
     const initLangCode = await getFirstPreferredLangCode();
@@ -890,6 +891,8 @@ export function setupController(
       // communication with popup
       controller.isClientOpen = true;
       controller.setupTrustedCommunication(portStream, remotePort.sender);
+      // TODO: HERE TO REQUEST FEATURE FLAGS
+      controller.remoteFeatureFlagController.getRemoteFeatureFlags();
 
       if (processName === ENVIRONMENT_TYPE_POPUP) {
         openPopupCount += 1;

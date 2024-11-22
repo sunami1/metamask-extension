@@ -635,3 +635,7 @@ export function doesUserHaveALedgerAccount(state) {
     return kr.type === KeyringType.ledger;
   });
 }
+
+export function getRemoteFeatureFlags(state) {
+  return state.metamask.remoteFeatureFlagController ?? {};
+}
