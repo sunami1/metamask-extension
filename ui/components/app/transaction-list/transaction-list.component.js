@@ -150,6 +150,7 @@ export default function TransactionList({
   const unfilteredCompletedTransactions = useSelector(
     nonceSortedCompletedTransactionsSelector,
   );
+
   const chainId = useSelector(getCurrentChainId);
   const selectedAccount = useSelector(getSelectedAccount);
 
